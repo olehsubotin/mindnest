@@ -2,11 +2,13 @@ import { guideSteps } from "@/app/lib/guideSteps";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-type Params = {
-  step: string;
+type GuideStepPageProps = {
+  params: {
+    step: string;
+  };
 };
 
-export default function GuideStepPage({ params }: { params: Params }) {
+export default function GuideStepPage({ params }: GuideStepPageProps) {
   const stepNumber = parseInt(params.step);
   const step = guideSteps.find((s) => s.id === stepNumber);
 
