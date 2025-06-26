@@ -2,30 +2,37 @@ import { guideSteps } from "@/app/lib/guideSteps";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-type GuideStepPageProps = {
-  params: {
-    step: string;
-  };
-};
+export async function generateStaticParams() {
+  return guideSteps.map((step) => ({
+    step: step.id.toString(),
+  }));
+}
 
-export default function GuideStepPage({ params }: GuideStepPageProps) {
-  const stepNumber = parseInt(params.step);
-  const step = guideSteps.find((s) => s.id === stepNumber);
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ step: string }>;
+}) {
+  const { step } = await params;
+  const stepNumber = parseInt(step);
+  const currentStep = guideSteps.find((s) => s.id === stepNumber);
 
-  if (!step) return notFound();
+  if (!currentStep) return notFound();
 
-  const nextStep = guideSteps.find((s) => s.id === stepNumber + 1);
-  const prevStep = guideSteps.find((s) => s.id === stepNumber - 1);
+  const prev = guideSteps.find((s) => s.id === stepNumber - 1);
+  const next = guideSteps.find((s) => s.id === stepNumber + 1);
 
   return (
-    <main className="max-w-xl mx-auto py-12 px-6 text-center">
-      <h1 className="text-2xl font-bold mb-4">{step.title}</h1>
-      <p className="mb-8 text-gray-700">{step.description}</p>
+    <main className="max-w-2xl mx-auto py-16 px-6 text-center">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-4">
+        {currentStep.title}
+      </h1>
+      <p className="mb-10 text-gray-600 text-lg">{currentStep.description}</p>
 
-      <div className="flex justify-between">
-        {prevStep ? (
-          <Link href={`/guide/${prevStep.id}`}>
-            <button className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+      <div className="flex justify-between items-center gap-4">
+        {prev ? (
+          <Link href={`/guide/${prev.id}`}>
+            <button className="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition">
               ← Previous
             </button>
           </Link>
@@ -33,15 +40,15 @@ export default function GuideStepPage({ params }: GuideStepPageProps) {
           <div />
         )}
 
-        {nextStep ? (
-          <Link href={`/guide/${nextStep.id}`}>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        {next ? (
+          <Link href={`/guide/${next.id}`}>
+            <button className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
               Next →
             </button>
           </Link>
         ) : (
           <Link href="/app">
-            <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            <button className="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition">
               Go to App →
             </button>
           </Link>
